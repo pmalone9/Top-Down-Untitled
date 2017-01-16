@@ -17,6 +17,8 @@
 		023101BD1E2B2AED00ECE6CE /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 023101BB1E2B2AED00ECE6CE /* LaunchScreen.storyboard */; };
 		023102131E2C849F00ECE6CE /* playerImage.png in Resources */ = {isa = PBXBuildFile; fileRef = 023102121E2C849F00ECE6CE /* playerImage.png */; };
 		023102151E2C84A600ECE6CE /* dot.png in Resources */ = {isa = PBXBuildFile; fileRef = 023102141E2C84A600ECE6CE /* dot.png */; };
+		0231021A1E2C8FD500ECE6CE /* 3assassins.png in Resources */ = {isa = PBXBuildFile; fileRef = 023102191E2C8FD500ECE6CE /* 3assassins.png */; };
+		0231021C1E2D71F200ECE6CE /* wall.png in Resources */ = {isa = PBXBuildFile; fileRef = 0231021B1E2D71F200ECE6CE /* wall.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -32,6 +34,8 @@
 		023101BE1E2B2AED00ECE6CE /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		023102121E2C849F00ECE6CE /* playerImage.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = playerImage.png; sourceTree = "<group>"; };
 		023102141E2C84A600ECE6CE /* dot.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dot.png; sourceTree = "<group>"; };
+		023102191E2C8FD500ECE6CE /* 3assassins.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = 3assassins.png; sourceTree = "<group>"; };
+		0231021B1E2D71F200ECE6CE /* wall.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = wall.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -71,12 +75,22 @@
 				023101B41E2B2AED00ECE6CE /* GameViewController.swift */,
 				023101B61E2B2AED00ECE6CE /* Main.storyboard */,
 				023101B91E2B2AED00ECE6CE /* Assets.xcassets */,
-				023102141E2C84A600ECE6CE /* dot.png */,
-				023102121E2C849F00ECE6CE /* playerImage.png */,
+				023102181E2C8F7100ECE6CE /* Images */,
 				023101BB1E2B2AED00ECE6CE /* LaunchScreen.storyboard */,
 				023101BE1E2B2AED00ECE6CE /* Info.plist */,
 			);
 			path = "Top Down Untitled";
+			sourceTree = "<group>";
+		};
+		023102181E2C8F7100ECE6CE /* Images */ = {
+			isa = PBXGroup;
+			children = (
+				023102121E2C849F00ECE6CE /* playerImage.png */,
+				0231021B1E2D71F200ECE6CE /* wall.png */,
+				023102191E2C8FD500ECE6CE /* 3assassins.png */,
+				023102141E2C84A600ECE6CE /* dot.png */,
+			);
+			name = Images;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -141,8 +155,10 @@
 			files = (
 				023102151E2C84A600ECE6CE /* dot.png in Resources */,
 				023101B81E2B2AED00ECE6CE /* Main.storyboard in Resources */,
+				0231021C1E2D71F200ECE6CE /* wall.png in Resources */,
 				023101AF1E2B2AED00ECE6CE /* GameScene.sks in Resources */,
 				023101BA1E2B2AED00ECE6CE /* Assets.xcassets in Resources */,
+				0231021A1E2C8FD500ECE6CE /* 3assassins.png in Resources */,
 				023101BD1E2B2AED00ECE6CE /* LaunchScreen.storyboard in Resources */,
 				023101B11E2B2AED00ECE6CE /* Actions.sks in Resources */,
 				023102131E2C849F00ECE6CE /* playerImage.png in Resources */,
