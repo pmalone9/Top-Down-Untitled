@@ -46,7 +46,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     
     override func didMove(to view: SKView) {
-        //self.physicsWorld.contactDelegate = self
+        self.physicsWorld.contactDelegate = self
         setupGame()
     }
     
@@ -86,13 +86,13 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // player
         player.position = CGPoint(x: self.frame.midX, y: 2 * self.frame.midX)
         //player.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
-        player.scale(to: CGSize(width: 75, height: 75))
-        player.physicsBody = SKPhysicsBody(rectangleOf: CGSize(width: player.size.width, height: player.size.height))
+        player.scale(to: CGSize(width: 40, height: 40))
+        player.physicsBody = SKPhysicsBody(rectangleOf: player.size)
         player.physicsBody?.isDynamic = false
         
-        player.physicsBody?.contactTestBitMask = colliderType.Environment.rawValue
+        player.physicsBody?.contactTestBitMask = colliderType.Environment.rawValue  // determines if contact (enemies maybe)
         player.physicsBody?.categoryBitMask = colliderType.Player.rawValue
-        player.physicsBody?.collisionBitMask = colliderType.Player.rawValue
+        player.physicsBody?.collisionBitMask = colliderType.Player.rawValue     // determines if player can move through
         self.addChild(player)
         
         
@@ -106,36 +106,36 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     func roomSetup(roomType: String) {
         
-        
-        
-        
+        // for different room themes instead of hard coding wall we can make it a string that will correspond to the theme's pieces
         let ltWall = SKSpriteNode(imageNamed: "wall")
-        let rtWall = SKSpriteNode(imageNamed: "wall")
-        ltWall.scale(to: CGSize(width: self.frame.width / 10, height: self.frame.height))
-        rtWall.scale(to: CGSize(width: self.frame.width / 10, height: self.frame.height))
-        
-        ltWall.position = CGPoint(x: 0, y: self.frame.height / 2)
+        ltWall.scale(to: CGSize(width: (self.frame.width / 20), height: self.frame.height))
+        ltWall.position = CGPoint(x: (ltWall.size.width / 2), y: self.frame.height / 2)
         ltWall.physicsBody = SKPhysicsBody(rectangleOf: ltWall.size)
-        rtWall.position = CGPoint(x: self.frame.width, y: self.frame.height / 2)
+        
+        let rtWall = SKSpriteNode(imageNamed: "wall")
+        rtWall.scale(to: CGSize(width: self.frame.width / 20, height: self.frame.height))
+        rtWall.position = CGPoint(x: self.frame.width - (rtWall.size.width / 2), y: self.frame.height / 2)
         rtWall.physicsBody = SKPhysicsBody(rectangleOf: rtWall.size)
         
         
         
         
         let btWall = SKSpriteNode(imageNamed: "wall")
-        let tpWall = SKSpriteNode(imageNamed: "wall")
         btWall.scale(to: CGSize(width: self.frame.width, height: self.frame.height / 10))
-        tpWall.scale(to: CGSize(width: self.frame.width, height: self.frame.height / 10))
-        
         btWall.position = CGPoint(x: self.frame.height / 2, y: self.frame.width - self.frame.width / 3)     // fix position
         btWall.physicsBody = SKPhysicsBody(rectangleOf: btWall.size)
+        
+        let tpWall = SKSpriteNode(imageNamed: "wall")
+        tpWall.scale(to: CGSize(width: self.frame.width, height: self.frame.height / 10))
         tpWall.position = CGPoint(x: self.frame.width / 2, y: 0)            // fix position
         tpWall.physicsBody = SKPhysicsBody(rectangleOf: tpWall.size)
         
+        
+        
         print("midX = \(self.frame.midX)\nmidY = \(self.frame.midY)\nheight = \(self.frame.height)\nwidth = \(self.frame.width)")
         
-        let wallArray = [ltWall, rtWall, btWall, tpWall]
         
+        let wallArray = [ltWall, rtWall, btWall, tpWall]
         for w in wallArray {
             
             w.physicsBody!.isDynamic = false
@@ -144,13 +144,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             w.physicsBody?.categoryBitMask = colliderType.Environment.rawValue
             w.physicsBody?.collisionBitMask = colliderType.Environment.rawValue
             
-            
             self.addChild(w)
-            print("wall added")
-            
         }
         
         
+        // based on the room type we might add like a block in the center or something
         switch roomType {
         case "basic":
             
@@ -197,7 +195,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             // determining if the turning stick is being used
             if tsActive {
                 
-                
+                player.physicsBody?.affectedByGravity = false
+                player.physicsBody?.isDynamic = true
                 let tsVector = CGVector(dx: location.x - tsBase.position.x, dy: location.y - tsBase.position.y)
                 let tsAngle = atan2(tsVector.dy, tsVector.dx)         // will be in radians
                 let tsLength:CGFloat = tsBase.frame.size.height / 2
@@ -215,7 +214,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             // determining if the moving stick is being used
             if msActive {
                 
-                
+                player.physicsBody?.affectedByGravity = false
+                player.physicsBody?.isDynamic = true
                 let msVector = CGVector(dx: location.x - msBase.position.x, dy: location.y - msBase.position.y)
                 let msAngle = atan2(msVector.dy, msVector.dx)         // will be in radians
                 let msLength:CGFloat = msBase.frame.size.height / 2
@@ -258,6 +258,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     
     func didBegin(_ contact: SKPhysicsContact) {
+        
         if !gameOver {
             
             // this checks if the player hits the wall
@@ -266,10 +267,12 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 
             } else {
                 print("contact")
+                player.physicsBody?.isDynamic = true
             }
             
             
         }   // end game over check
+        
     }
     
     
