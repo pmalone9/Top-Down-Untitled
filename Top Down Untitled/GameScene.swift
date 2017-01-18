@@ -82,17 +82,20 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         moveStick.scale(to: CGSize(width: 100, height: 100))
         
         
-        
         // player
         player.position = CGPoint(x: self.frame.midX, y: 2 * self.frame.midX)
-        //player.position = CGPoint(x: self.frame.midX, y: self.frame.midY)
         player.scale(to: CGSize(width: 40, height: 40))
         player.physicsBody = SKPhysicsBody(rectangleOf: player.size)
-        player.physicsBody?.isDynamic = false
+        player.physicsBody?.isDynamic = true
+        player.physicsBody?.affectedByGravity = false
         
         player.physicsBody?.contactTestBitMask = colliderType.Environment.rawValue  // determines if contact (enemies maybe)
-        player.physicsBody?.categoryBitMask = colliderType.Player.rawValue
-        player.physicsBody?.collisionBitMask = colliderType.Player.rawValue     // determines if player can move through
+        player.physicsBody?.categoryBitMask = colliderType.Player.rawValue      // equals the enum value
+        player.physicsBody?.collisionBitMask = colliderType.Player.rawValue
+        
+        player.physicsBody?.usesPreciseCollisionDetection = true
+        
+        print(colliderType.Player.rawValue)
         self.addChild(player)
         
         
@@ -121,8 +124,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         
         let btWall = SKSpriteNode(imageNamed: "wall")
-        btWall.scale(to: CGSize(width: self.frame.width, height: self.frame.height / 10))
-        btWall.position = CGPoint(x: self.frame.height / 2, y: self.frame.width - self.frame.width / 3)     // fix position
+        btWall.scale(to: CGSize(width: self.frame.width - (ltWall.size.width + rtWall.size.width), height: self.frame.height / 20))
+        btWall.position = CGPoint(x:  self.frame.midX, y: 2 * self.frame.midX)     // fix position
         btWall.physicsBody = SKPhysicsBody(rectangleOf: btWall.size)
         
         let tpWall = SKSpriteNode(imageNamed: "wall")
@@ -141,8 +144,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             w.physicsBody!.isDynamic = false
             
             w.physicsBody?.contactTestBitMask = colliderType.Environment.rawValue
-            w.physicsBody?.categoryBitMask = colliderType.Environment.rawValue
-            w.physicsBody?.collisionBitMask = colliderType.Environment.rawValue
+            w.physicsBody?.categoryBitMask = colliderType.Player.rawValue      // equals the enum value
+            w.physicsBody?.collisionBitMask = colliderType.Player.rawValue
+            
+            w.physicsBody?.usesPreciseCollisionDetection = true
             
             self.addChild(w)
         }
@@ -226,7 +231,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 } else {
                     moveStick.position = CGPoint(x: msBase.position.x - msXDist, y: tsBase.position.y + msYDist)
                 }
-                player.position = CGPoint(x: player.position.x + (msVector.dx / 20), y: player.position.y + (msVector.dy / 20))     //to fix the issue stated above, maybe have this line be in setupGame or something
+                
+                player.position = CGPoint(x: player.position.x + (msVector.dx / abs(0.5 * msVector.dx)), y: player.position.y + (msVector.dy / abs(0.5 * msVector.dy)))     //to fix the issue stated above, maybe have this line be in setupGame or something
                 // adjust the movement speed as needed
                 
                 
@@ -262,6 +268,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if !gameOver {
             
             // this checks if the player hits the wall
+            // I think we will have to use one of the other two (not contactBitMask) for this stuff
             if contact.bodyA.categoryBitMask == colliderType.Environment.rawValue || contact.bodyB.categoryBitMask == colliderType.Environment.rawValue {
                 print("Hit a wall")
                 
