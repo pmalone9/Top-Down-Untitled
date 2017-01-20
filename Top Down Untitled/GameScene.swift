@@ -32,6 +32,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     let msBase = SKSpriteNode(imageNamed: "dot.png")
     var msActive = false
     
+    var isTouched = false
+    var location = CGPoint.zero
+    
+    
+    
     
     // setting up collisions
     enum colliderType: UInt32 {
@@ -85,7 +90,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         // player
         player.position = CGPoint(x: self.frame.midX, y: 2 * self.frame.midX)
         player.scale(to: CGSize(width: 40, height: 40))
-        player.physicsBody = SKPhysicsBody(rectangleOf: player.size)
+        player.physicsBody = SKPhysicsBody(circleOfRadius: player.size.width / 2)
         player.physicsBody?.isDynamic = true
         player.physicsBody?.affectedByGravity = false
         
@@ -99,7 +104,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(player)
         
         
-        // changes the opacity
+        // changes the opacity, maybe make them fade out when the player starts to use them
         turnStick.alpha = 0.4
         tsBase.alpha = 0.4
         moveStick.alpha = 0.4
@@ -170,9 +175,62 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     
     
+    
+    func movePlayer() {
+        // determining if the turning stick is being used
+        if tsActive {
+            
+            player.physicsBody?.affectedByGravity = false
+            player.physicsBody?.isDynamic = true
+            let tsVector = CGVector(dx: location.x - tsBase.position.x, dy: location.y - tsBase.position.y)
+            let tsAngle = atan2(tsVector.dy, tsVector.dx)         // will be in radians
+            let tsLength:CGFloat = tsBase.frame.size.height / 2
+            let tsXDist:CGFloat = sin(tsAngle - 1.57079633) * tsLength
+            let tsYDist:CGFloat = cos(tsAngle - 1.57079633) * tsLength
+            if(tsBase.frame.contains(location)) {
+                turnStick.position = location
+            } else {
+                turnStick.position = CGPoint(x: tsBase.position.x - tsXDist, y: tsBase.position.y + tsYDist)
+            }
+            player.zRotation = tsAngle      //to fix the issue stated above, maybe have this line be in setupGame or something
+        }   // ends tsActive test
+        
+        
+        // determining if the moving stick is being used
+        if msActive {
+            
+            player.physicsBody?.affectedByGravity = false
+            player.physicsBody?.isDynamic = true
+            let msVector = CGVector(dx: location.x - msBase.position.x, dy: location.y - msBase.position.y)
+            let msAngle = atan2(msVector.dy, msVector.dx)         // will be in radians
+            let msLength:CGFloat = msBase.frame.size.height / 2
+            let msXDist:CGFloat = sin(msAngle - 1.57079633) * msLength
+            let msYDist:CGFloat = cos(msAngle - 1.57079633) * msLength
+            if(msBase.frame.contains(location)) {
+                moveStick.position = location
+            } else {
+                moveStick.position = CGPoint(x: msBase.position.x - msXDist, y: tsBase.position.y + msYDist)
+            }
+            
+            player.position = CGPoint(x: player.position.x + (msVector.dx / abs(0.5 * msVector.dx)), y: player.position.y + (msVector.dy / abs(0.5 * msVector.dy)))     //to fix the issue stated above, maybe have this line be in setupGame or something
+            // adjust the movement speed as needed
+            
+            
+        }   // ends msActive test
+    }
+    
+    
+    
+    
+    
+    
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        isTouched = true
+        
         for t in touches {
-            let location = t.location(in: self)
+            location = t.location(in: self)
             
             if(tsBase.frame.contains(location)) {
                 tsActive = true
@@ -185,82 +243,57 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             } else {
                 msActive = false
             }
+            
+            
         }
+        
     }
     
     
     
     
-    // there is a problem with the movement, if the user holds their finger still while on the joystick the player will not move
-    // same problem with the rotation, if we want the player to automatically shoot if the player's thumb is on the turnstick, it won't shoot if they hold their thumb still
+    
+    
+    
+    
+    
+    
     override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
         for t in touches {
-            let location = t.location(in: self)
-            
-            // determining if the turning stick is being used
-            if tsActive {
-                
-                player.physicsBody?.affectedByGravity = false
-                player.physicsBody?.isDynamic = true
-                let tsVector = CGVector(dx: location.x - tsBase.position.x, dy: location.y - tsBase.position.y)
-                let tsAngle = atan2(tsVector.dy, tsVector.dx)         // will be in radians
-                let tsLength:CGFloat = tsBase.frame.size.height / 2
-                let tsXDist:CGFloat = sin(tsAngle - 1.57079633) * tsLength
-                let tsYDist:CGFloat = cos(tsAngle - 1.57079633) * tsLength
-                if(tsBase.frame.contains(location)) {
-                    turnStick.position = location
-                } else {
-                    turnStick.position = CGPoint(x: tsBase.position.x - tsXDist, y: tsBase.position.y + tsYDist)
-                }
-                player.zRotation = tsAngle      //to fix the issue stated above, maybe have this line be in setupGame or something
-            }   // ends tsActive test
-            
-            
-            // determining if the moving stick is being used
-            if msActive {
-                
-                player.physicsBody?.affectedByGravity = false
-                player.physicsBody?.isDynamic = true
-                let msVector = CGVector(dx: location.x - msBase.position.x, dy: location.y - msBase.position.y)
-                let msAngle = atan2(msVector.dy, msVector.dx)         // will be in radians
-                let msLength:CGFloat = msBase.frame.size.height / 2
-                let msXDist:CGFloat = sin(msAngle - 1.57079633) * msLength
-                let msYDist:CGFloat = cos(msAngle - 1.57079633) * msLength
-                if(msBase.frame.contains(location)) {
-                    moveStick.position = location
-                } else {
-                    moveStick.position = CGPoint(x: msBase.position.x - msXDist, y: tsBase.position.y + msYDist)
-                }
-                
-                player.position = CGPoint(x: player.position.x + (msVector.dx / abs(0.5 * msVector.dx)), y: player.position.y + (msVector.dy / abs(0.5 * msVector.dy)))     //to fix the issue stated above, maybe have this line be in setupGame or something
-                // adjust the movement speed as needed
-                
-                
-            }   // ends tsActive test
-            
+            location = t.location(in: self)
         }   // ends for loop
     }
     
     
     
     
+    
+    
+    
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         
-            // turning
-            if tsActive {
-                let centerStick = SKAction.move(to: tsBase.position, duration: 0.1)
-                centerStick.timingMode = .easeOut
-                turnStick.run(centerStick)
-            }
-            
-            // moving
-            if msActive {
-                let centerStick = SKAction.move(to: msBase.position, duration: 0.1)
-                centerStick.timingMode = .easeOut
-                moveStick.run(centerStick)
-            }
-
+        isTouched = false
+        
+        // turning
+        if tsActive {
+            let centerStick = SKAction.move(to: tsBase.position, duration: 0.1)
+            centerStick.timingMode = .easeOut
+            turnStick.run(centerStick)
+        }
+        
+        // moving
+        if msActive {
+            let centerStick = SKAction.move(to: msBase.position, duration: 0.1)
+            centerStick.timingMode = .easeOut
+            moveStick.run(centerStick)
+        }
     }
+    
+    
+    
+    
+    
     
     
     func didBegin(_ contact: SKPhysicsContact) {
@@ -285,7 +318,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     
     
+    
+    
     override func update(_ currentTime: TimeInterval) {
         // Called before each frame is rendered
+        
+        if isTouched {
+            movePlayer()
+        }   // ends isTouched check
+        
     }
 }
