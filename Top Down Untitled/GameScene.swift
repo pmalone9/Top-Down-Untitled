@@ -177,11 +177,14 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     
     
     func movePlayer() {
+        
+        player.physicsBody?.affectedByGravity = false
+        player.physicsBody?.isDynamic = true
+        
         // determining if the turning stick is being used
         if tsActive {
             
-            player.physicsBody?.affectedByGravity = false
-            player.physicsBody?.isDynamic = true
+            
             let tsVector = CGVector(dx: location.x - tsBase.position.x, dy: location.y - tsBase.position.y)
             let tsAngle = atan2(tsVector.dy, tsVector.dx)         // will be in radians
             let tsLength:CGFloat = tsBase.frame.size.height / 2
@@ -198,9 +201,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         // determining if the moving stick is being used
         if msActive {
-            
-            player.physicsBody?.affectedByGravity = false
-            player.physicsBody?.isDynamic = true
             let msVector = CGVector(dx: location.x - msBase.position.x, dy: location.y - msBase.position.y)
             let msAngle = atan2(msVector.dy, msVector.dx)         // will be in radians
             let msLength:CGFloat = msBase.frame.size.height / 2
@@ -218,60 +218,65 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             
         }   // ends msActive test
     }
+
     
     
     
-    
-    
-    
+    var touchArray = [UITouch]()
+    var touchCount = 0
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         
+        //touchArray.append(touches.first!)
+        //touchCount = touches.count
+        
         isTouched = true
-        
         for t in touches {
+        
+        
+            touchArray.append(t)
+            touchCount = touches.count
+            
             location = t.location(in: self)
             
-            if(tsBase.frame.contains(location)) {
-                tsActive = true
-            } else {
-                tsActive = false
-            }
             
-            if(msBase.frame.contains(location)) {
-                msActive = true
-            } else {
-                msActive = false
-            }
+                // I think all I have to do to fix the single touch issue is check if either touch in touchArray is in the frame
+                
+                if(tsBase.frame.contains(location)) {
+                    tsActive = true
+                } else {
+                    tsActive = false
+                }
+                
+                if(msBase.frame.contains(location)) {
+                    msActive = true
+                } else {
+                    msActive = false
+                }
+                
+                
             
             
-        }
-        
-    }
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
-        
-        for t in touches {
-            location = t.location(in: self)
         }   // ends for loop
     }
     
-    
-    
-    
-    
-    
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        for t in touches {
+            location = t.location(in: self)
+        }
+    }
     
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+        
+        if(touchCount - touches.count < 0) {
+            touchCount = 0
+        } else {
+            touchCount -= touches.count
+        }
+        if(touchCount != 0) {
+            touchArray.remove(at: 0)
+        }
+        
         
         isTouched = false
         
@@ -326,6 +331,8 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         if isTouched {
             movePlayer()
         }   // ends isTouched check
+        
+        print(touchCount)
         
     }
 }
